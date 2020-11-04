@@ -80,8 +80,7 @@ def main():
             done.wait()
 
             set_volume(MAX_VOLUME)
-            leds.pattern = Pattern.breathe(100)
-            leds.update(Leds.rgb_pattern(Color.GREEN))
+            leds.update(Leds.rgb_on(Color.GREEN))
             print('GOOD MORNING!')
             play_wav(GOOD_MORNING_SOUND_PATH)
 
