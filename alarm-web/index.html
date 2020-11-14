@@ -96,18 +96,20 @@
         e.preventDefault();
 
         const timeInput = $("#time");
+        const enabledInput = $("#enabled");
         const submitButton = $("#submit");
 
         submitButton.disabled = true;
 
         const time = timeInput.value;
+        const enabled = enabledInput.checked;
 
         fetch(e.target.action, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ time }),
+          body: JSON.stringify({ time, enabled }),
         })
           .then((res) => res.text())
           .then((value) => {
@@ -117,9 +119,10 @@
 
       document.addEventListener("DOMContentLoaded", function () {
         fetch("/alarm")
-          .then((res) => res.text())
-          .then((value) => {
-            $("#time").value = value;
+          .then((res) => res.json())
+          .then((config) => {
+            $("#time").value = config.time;
+            $("#enabled").checked = config.enabled;
           });
 
         $("form").addEventListener("submit", handleSubmit);

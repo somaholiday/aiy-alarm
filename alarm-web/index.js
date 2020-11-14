@@ -8,7 +8,7 @@ const hostname = os.hostname();
 const app = express();
 const port = 8000;
 
-const config_file = path.resolve(__dirname, "../config.txt");
+const config_file = path.resolve(__dirname, "../config.json");
 
 app.use(express.static("static"));
 app.use(bodyParser.json());
@@ -37,12 +37,13 @@ app.get("/", (req, res) => {
 
 app.get("/alarm", (req, res) => {
   const config = readConfig();
+  res.setHeader("content-type", "application/json");
   res.send(config);
 });
 
 app.post("/alarm", (req, res) => {
   console.log("Got body:", req.body);
-  writeConfig(req.body.time);
+  writeConfig(JSON.stringify(req.body));
   res.send("OK");
 });
 
