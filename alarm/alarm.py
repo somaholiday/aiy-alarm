@@ -29,6 +29,7 @@ def sound_path(sound_file):
 ALARM_SOUND_PATH = sound_path('core_66.wav')
 GOOD_MORNING_SOUND_PATH = sound_path('good_morning.wav')
 SLEEP_TIME = 1.75
+TIMEOUT_LIMIT = 10 * 60
 
 VOLUME_CMD = 'amixer sset Master playback %d%%'
 def set_volume(percent):
@@ -46,6 +47,7 @@ def alarm(done, leds):
     print("alarm thread")
     intensity = 0
     start = time.monotonic()
+    duration = 0
 
     while not done.is_set():
         if (intensity < 1):
@@ -74,15 +76,16 @@ def main():
             done = threading.Event()
             board.button.when_pressed = done.set
 
-            alarm_thread = threading.Thread(target=alarm, args=(done,leds))
+            alarm_thread = threading.Thread(target=alarm, args=(done,leds), daemon=True)
             alarm_thread.start()
 
-            done.wait()
-
-            set_volume(MAX_VOLUME)
-            leds.update(Leds.rgb_on(Color.GREEN))
-            print('GOOD MORNING!')
-            play_wav(GOOD_MORNING_SOUND_PATH)
+            if done.wait(timeout=TIMEOUT_LIMIT):
+                set_volume(MAX_VOLUME)
+                leds.update(Leds.rgb_on(Color.GREEN))
+                print('GOOD MORNING!')
+                play_wav(GOOD_MORNING_SOUND_PATH)
+            else:
+                print('Timed out.')
 
 if __name__ == '__main__':
     main()
