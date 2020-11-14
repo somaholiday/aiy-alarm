@@ -1,99 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zerocube Alarm</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zerocube Alarm</title>
 
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap");
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap");
 
-    :root {
-      --blue: #00aeef;
-      --blue-lighter: #41cbfe;
-      --body: rgb(203, 198, 192);
-      --body-bg: rgb(29, 30, 34);
-    }
+      :root {
+        --blue: #00aeef;
+        --blue-lighter: #41cbfe;
+        --body: rgb(203, 198, 192);
+        --body-bg: rgb(29, 30, 34);
+      }
 
-    body {
-      background-color: var(--body-bg);
-      color: var(--body);
-      margin: 0;
-      font-family: "Montserrat", sans-serif;
-      font-size: 72px;
-    }
+      body {
+        background-color: var(--body-bg);
+        color: var(--body);
+        margin: 0;
+        font-family: "Montserrat", sans-serif;
+        font-size: 72px;
+      }
 
-    .page {
-      align-content: center;
-      display: grid;
-      justify-content: center;
-      min-height: 100vh;
-    }
+      .page {
+        align-content: center;
+        display: grid;
+        justify-content: center;
+        min-height: 100vh;
+      }
 
-    input, button {
-      display: block;
-      font-family: inherit;
-      font-size: inherit;
-    }
+      #time,
+      button {
+        display: block;
+        font-family: inherit;
+        font-size: inherit;
+      }
 
-    input {
-      margin-bottom: 16px;
-      padding: 16px;
-    }
+      #time {
+        margin-bottom: 16px;
+        padding: 16px;
+      }
 
-    button {
-      cursor: pointer;
-      font-weight: bold;
-      padding: 16px;
-      width: 100%;
-    }
-  </style>
-  <script type="text/javascript">
-    const $ = document.querySelector.bind(document);
-    const $$ = document.querySelectorAll.bind(document);
+      input[type="checkbox"] {
+        position: absolute;
+        z-index: -1000;
+        left: -1000px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        width: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
+      }
 
-    function handleSubmit(e) {
-      e.preventDefault();
+      input[type="checkbox"] + label.checkbox-label {
+        padding-left: 55px;
+        height: 50px;
+        display: inline-block;
+        line-height: 50px;
+        background-repeat: no-repeat;
+        background-position: 0 0;
+        font-size: 50px;
+        vertical-align: middle;
+        cursor: pointer;
+      }
 
-      const timeInput = $("#time");
-      const submitButton = $("#submit");
+      input[type="checkbox"]:checked + label.checkbox-label {
+        background-position: 0 -50px;
+      }
 
-      submitButton.disabled = true;
+      label {
+        background-image: url("checkbox.png");
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
 
-      const time = timeInput.value;
+      button {
+        cursor: pointer;
+        font-weight: bold;
+        padding: 16px;
+        width: 100%;
+      }
+    </style>
+    <script type="text/javascript">
+      const $ = document.querySelector.bind(document);
+      const $$ = document.querySelectorAll.bind(document);
 
-      fetch(e.target.action, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({time})
-      })
-      .then(res => res.text())
-      .then(value => {
-        submitButton.disabled = false;
+      function handleSubmit(e) {
+        e.preventDefault();
+
+        const timeInput = $("#time");
+        const submitButton = $("#submit");
+
+        submitButton.disabled = true;
+
+        const time = timeInput.value;
+
+        fetch(e.target.action, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ time }),
+        })
+          .then((res) => res.text())
+          .then((value) => {
+            submitButton.disabled = false;
+          });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        fetch("/alarm")
+          .then((res) => res.text())
+          .then((value) => {
+            $("#time").value = value;
+          });
+
+        $("form").addEventListener("submit", handleSubmit);
       });
-    }
+    </script>
+  </head>
 
-    document.addEventListener("DOMContentLoaded", function() {
-      fetch('/alarm')
-        .then(res => res.text())
-        .then(value => {
-          $("#time").value = value
-        });
-
-      $('form').addEventListener('submit', handleSubmit);
-    });
-  </script>
-</head>
-<body>
-  <div class="page">
-    <div class="container">
-      <form action="alarm">
-        <input type="time" name="time" id="time" />
-        <button id="submit" type="submit">Set Alarm</button>
-      </form>
+  <body>
+    <div class="page">
+      <div class="container">
+        <form action="alarm">
+          <input type="time" name="time" id="time" />
+          <input type="checkbox" name="enabled" id="enabled" class="checkbox" />
+          <label for="enabled" class="checkbox-label">Enabled</label>
+          <button id="submit" type="submit">Set Alarm</button>
+        </form>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>
