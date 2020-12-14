@@ -10,7 +10,7 @@ const port = 8000;
 
 const config_file = path.resolve(__dirname, "../config.json");
 
-app.use(express.static("static"));
+app.use(express.static(path.resolve(__dirname, "static")));
 app.use(bodyParser.json());
 
 function readConfig() {
